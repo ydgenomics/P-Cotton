@@ -1,4 +1,6 @@
-# SCTransform.harmony_integration.R 1106
+# SCTransform.harmony_integration.R 250223
+# https://satijalab.org/seurat/articles/seurat5_integration
+# Interesting thing is written for V5.20 'split()' and 'IntegrateLayers'
 library(Seurat) # make sure you are running SeuratV5
 options(Seurat.object.assay.version = 'v5')
 library(SeuratData)
@@ -90,7 +92,8 @@ obj <- FindClusters(obj, resolution = resolution_set, cluster.name = "celltype")
 obj <- RunUMAP(obj, reduction = "harmony", dims = 1:30, reduction.name = "umap")
 
 DefaultAssay(obj) <- "RNA"
-obj <- JoinLayers(obj)
+#obj <- JoinLayers(obj)
+obj [["RNA"]] <- JoinLayers(obj [["RNA"]])
 
 saveRDS(obj, file = out_rds)
 #
