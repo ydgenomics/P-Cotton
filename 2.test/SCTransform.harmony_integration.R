@@ -1,4 +1,4 @@
-# SCTransform.harmony_integration.R 250223
+# SCTransform.harmony_integration.R 250225
 # https://satijalab.org/seurat/articles/seurat5_integration
 # Interesting thing is written for V5.20 'split()' and 'IntegrateLayers'
 library(Seurat) # make sure you are running SeuratV5
@@ -94,6 +94,9 @@ obj <- RunUMAP(obj, reduction = "harmony", dims = 1:30, reduction.name = "umap")
 DefaultAssay(obj) <- "RNA"
 #obj <- JoinLayers(obj)
 obj [["RNA"]] <- JoinLayers(obj [["RNA"]])
+
+# Assay RNA changing from Assay5 to Assay
+obj[["RNA"]] <- as(obj[["RNA"]], "Assay")
 
 saveRDS(obj, file = out_rds)
 #
