@@ -61,9 +61,9 @@ obj <- RunOptimizeALS(obj, k = 30, lambda = 5, split.by = batch_key)
 obj <- RunQuantileNorm(obj, split.by = batch_key)
 names(obj@reductions)
 obj <- FindNeighbors(obj, reduction = "iNMF", k.param = 10, dims = 1:30)
-obj <- FindClusters(obj, resolution = resolution_set, cluster.name = "inmf_clusters")
+obj <- FindClusters(obj, resolution = resolution_set, cluster.name = "iNMF_clusters")
 
-obj <- RunUMAP(obj, dims = 1:ncol(obj[["iNMF"]]), reduction = "iNMF", reduction.name = "umap.inmf", n_neighbors = 15L) # nolint
+obj <- RunUMAP(obj, dims = 1:ncol(obj[["iNMF"]]), reduction = "iNMF", reduction.name = "umap_iNMF", n_neighbors = 15L) # nolint
 
 # have to convert all factor to character, or when later converting to h5ad, the factors will be numbers # nolint
 i <- sapply(obj@meta.data, is.factor)
@@ -73,10 +73,10 @@ obj # check the object
 
 saveRDS(obj, file = out_rds)
 pdf(out_UMAP)
-DimPlot(obj, reduction = "umap.inmf", split.by = batch_key)
-DimPlot(obj, reduction = "umap.inmf", group.by = batch_key, shuffle = TRUE, label = TRUE) # nolint
-DimPlot(obj, reduction = "umap.inmf", group.by = sample_key, shuffle = TRUE, label = TRUE) # nolint
-DimPlot(obj, reduction = "umap.inmf", group.by = "inmf_clusters", shuffle = TRUE, label = TRUE) # nolint
+DimPlot(obj, reduction = "umap_iNMF", split.by = batch_key)
+DimPlot(obj, reduction = "umap_iNMF", group.by = batch_key, shuffle = TRUE, label = TRUE) # nolint
+DimPlot(obj, reduction = "umap_iNMF", group.by = sample_key, shuffle = TRUE, label = TRUE) # nolint
+DimPlot(obj, reduction = "umap_iNMF", group.by = "iNMF_clusters", shuffle = TRUE, label = TRUE) # nolint
 VlnPlot(obj, features = c("nCount_RNA", "nFeature_RNA"), group.by= batch_key)
 dev.off()
 

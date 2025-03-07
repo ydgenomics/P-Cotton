@@ -65,12 +65,12 @@ obj <- RunPCA(obj, npcs = 30, verbose = FALSE)
 # Perform streamlined (one-line) integrative analysis
 obj <- IntegrateLayers(
   object = obj, method = CCAIntegration,
-  orig.reduction = "pca", new.reduction = "integrated.cca",
+  orig.reduction = "pca", new.reduction = "cca",
   assay = "SCT", verbose = FALSE
 )
 obj <- IntegrateLayers(
   object = obj, method = RPCAIntegration,
-  orig.reduction = "pca", new.reduction = "integrated.rpca",
+  orig.reduction = "pca", new.reduction = "rpca",
   assay = "SCT", verbose = FALSE
 )
 obj <- IntegrateLayers(
@@ -80,7 +80,7 @@ obj <- IntegrateLayers(
 )
 obj <- IntegrateLayers(
   object = obj, method = FastMNNIntegration,
-  new.reduction = "integrated.mnn",
+  new.reduction = "mnn",
   assay = "SCT", verbose = FALSE
 )
 
@@ -91,18 +91,18 @@ dev.off()
 
 out_UMAP <- gsub(".pdf", "", out_UMAP) # nolint
 
-integrations <- c("integrated.cca", "integrated.rpca", "harmony", "integrated.mnn") # nolint
+integrations <- c("cca", "rpca", "harmony", "mnn") # nolint
 cluster_names <- c("cca_clusters", "rpca_clusters", "harmony_clusters", "mnn_clusters") # nolint
 
 for (i in seq_along(integrations)) {
   obj <- FindNeighbors(obj, reduction = integrations[i], dims = 1:30)
   obj <- FindClusters(obj, resolution = resolution_set, cluster.name = cluster_names[i]) # nolint
-  obj <- RunUMAP(obj, reduction = integrations[i], dims = 1:30, reduction.name = paste0("umap.", integrations[i])) # nolint
+  obj <- RunUMAP(obj, reduction = integrations[i], dims = 1:30, reduction.name = paste0("umap_", integrations[i])) # nolint
   pdf(paste0(out_UMAP, "_", integrations[i], ".pdf"))
-  DimPlot(obj, reduction = paste0("umap.", integrations[i]), split.by = batch_key) # nolint
-  DimPlot(obj, reduction = paste0("umap.", integrations[i]), group.by = batch_key, shuffle = TRUE, label = TRUE) # nolint
-  DimPlot(obj, reduction = paste0("umap.", integrations[i]), group.by = sample_key, shuffle = TRUE, label = TRUE) # nolint
-  DimPlot(obj, reduction = paste0("umap.", integrations[i]), group.by = cluster_names[i], shuffle = TRUE, label = TRUE) # nolint
+  DimPlot(obj, reduction = paste0("umap_", integrations[i]), split.by = batch_key) # nolint
+  DimPlot(obj, reduction = paste0("umap_", integrations[i]), group.by = batch_key, shuffle = TRUE, label = TRUE) # nolint
+  DimPlot(obj, reduction = paste0("umap_", integrations[i]), group.by = sample_key, shuffle = TRUE, label = TRUE) # nolint
+  DimPlot(obj, reduction = paste0("umap_", integrations[i]), group.by = cluster_names[i], shuffle = TRUE, label = TRUE) # nolint
   dev.off()
 }
 

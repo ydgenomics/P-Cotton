@@ -14,10 +14,9 @@ from matplotlib.backends.backend_pdf import PdfPages
 @click.argument("out_umap", type=click.Path(exists=False), default=None)
 @click.option('--batch_key', type=str, default=None, help="Batch key in identifying HVG and harmony integration")
 @click.option('--sample_key', type=str, default=None, help="Sample key to distinguish sample")
-@click.option('--cluster_key', type=str, default=None, help="Cluster key in samples")
 @click.option('--resolution_set', type=float, default=None, help="set for resolution, is float")
 
-def run_harmony(input_h5ad, out_h5ad, out_umap, batch_key, sample_key, cluster_key, resolution_set):
+def run_harmony(input_h5ad, out_h5ad, out_umap, batch_key, sample_key, resolution_set):
     click.echo('Start harmony integration')
     sc.set_figure_params(dpi_save=300, frameon=False, figsize=(10, 6))
     #input_h5ad="/data/work/read/Cer_test.h5ad"
@@ -36,23 +35,20 @@ def run_harmony(input_h5ad, out_h5ad, out_umap, batch_key, sample_key, cluster_k
     #adata.obsm['X_umapraw'] = adata.obsm['X_umap']
     click.echo("Harmony")
     sc.external.pp.harmony_integrate(adata, key=batch_key, basis = 'X_pca')
-    #sc.pp.neighbors(adata, use_rep='X_pca_harmony', key_added = 'harmony', n_neighbors=15, n_pcs=40)
     sc.pp.neighbors(adata, use_rep='X_pca_harmony', n_neighbors=15, n_pcs=40)
-    sc.tl.leiden(adata, resolution=resolution_set, key_added='celltype', flavor='igraph', n_iterations=2, directed=False) 
-    adata.obs['celltype'].unique()
+    sc.tl.leiden(adata, resolution=resolution_set, key_added='harmony_clusters', flavor='igraph', n_iterations=2, directed=False) 
+    adata.obs['harmony_clusters'].unique()
     sc.tl.umap(adata, neighbors_key = 'neighbors') ## to match min_dist in seurat
     with PdfPages(out_umap) as pdf:
-        sc.pl.umap(adata, color=[batch_key, sample_key, cluster_key], ncols=1)
+        sc.pl.umap(adata, color=[batch_key, sample_key, "harmony_clusters"], ncols=1)
         plt.savefig(pdf, format='pdf', dpi=300, bbox_inches='tight')
         plt.close()
-        sc.pl.violin(adata, keys=['total_counts'], log=False, groupby='biosample')
+        sc.pl.violin(adata, keys=['total_counts'], log=False, groupby=batch_key)
         plt.savefig(pdf, format='pdf', dpi=300, bbox_inches='tight')
         plt.close()
-        sc.pl.violin(adata, keys=['n_genes'], log=False, groupby='biosample')
+        sc.pl.violin(adata, keys=['n_genes'], log=False, groupby=batch_key)
         plt.savefig(pdf, format='pdf', dpi=300, bbox_inches='tight')
         plt.close()
-    #adata.obsm['X_umapharmony'] = adata.obsm['X_umap']
-    #click.echo("scvi integrated adata structure")
     #
     adata
     click.echo("Save output")
