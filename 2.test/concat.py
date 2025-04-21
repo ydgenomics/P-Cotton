@@ -1,4 +1,6 @@
-# read.py concat biosample 1017
+# Title: concat.py
+# Date: 2025-04-21
+# Fix: add `join` key
 import pandas as pd
 import scanpy as sc
 import anndata as ad
@@ -6,6 +8,7 @@ import sys
 files_txt_path = sys.argv[1]
 projects_txt_path = sys.argv[2]
 species=sys.argv[3]
+group_key=sys.argv[4] #"biosample"
 with open(files_txt_path, 'r') as file:
     file_content = file.read().strip()
 indataget = file_content.split(',')
@@ -19,16 +22,10 @@ for i in range(len(indataget)):
     key = projects[i]
     value = indataget[i]
     value = sc.read_h5ad(value)
-    #ensure concat used by raw data
-    value.X = value.layers["counts"]
+    value.X = value.layers["counts"] #ensure concat used by raw data
     adatas[key] = value
-#if len(adatas) == 1:
-#    adata = list(adatas.values())[0]
-#    adata.obs['biosample'] = 'biosample_value'
-#elif len(adatas) > 1:
-    adata = ad.concat(adatas, label="biosample")
+    adata = ad.concat(adatas, label=group_key, join="outer")
 adata.obs_names_make_unique()
-print(adata.obs["biosample"].value_counts())
-
+print(adata.obs[group_key].value_counts())
 print(adata.obs.columns)
 adata.write_h5ad(filename=species+'.h5ad',compression="gzip")
