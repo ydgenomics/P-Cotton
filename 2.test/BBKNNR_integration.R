@@ -108,3 +108,4 @@ DimPlot(obj, reduction = "umap", group.by = sample_key, shuffle = TRUE, label = 
 DimPlot(obj, reduction = "umap", group.by = cluster_key, shuffle = TRUE, label = TRUE)
 VlnPlot(obj, features = c("nCount_RNA", "nFeature_RNA"), group.by= batch_key)
 dev.off()
+#VlnPlot(obj, features = c("nCount_RNA", "nFeature_RNA", "percent.mt"), group.by= "biosample")
